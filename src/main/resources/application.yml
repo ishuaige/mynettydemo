@@ -1,0 +1,9 @@
+server:
+  port: 8081
+spring:
+  web:
+    resources:
+      static-locations: classpath:/templates/
+  mvc:
+    view:
+      suffix: .html
