@@ -6,7 +6,7 @@
     <script type="text/javascript">
         let socket;
         if(window.WebSocket){
-            socket = new WebSocket("ws://localhost:8088/ws");
+            socket = new WebSocket("ws://localhost:8089/ws?id=1231231");
             socket.onmessage = function(event){
                 let textarea = document.getElementById('responseText');
                 textarea.value += event.data+"\r\n";

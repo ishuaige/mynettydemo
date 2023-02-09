@@ -19,8 +19,7 @@ import javax.annotation.Resource;
  */
 @Component
 public class WebSocketServerInitializer extends ChannelInitializer<SocketChannel> {
-    @Resource
-    ChatHandler chatHandler;
+
     @Override
     protected void initChannel(SocketChannel socketChannel) throws Exception {
         ChannelPipeline pipeline = socketChannel.pipeline();
@@ -33,9 +32,11 @@ public class WebSocketServerInitializer extends ChannelInitializer<SocketChannel
                 .addLast("aggregator", new HttpObjectAggregator(65536))
                 // 对写大数据流的支持
                 .addLast("http-chunked", new ChunkedWriteHandler())
+                //用来解析建立websocket连接时url携带的参数
+                .addLast(new TextWebSocketFrameHandler())
                 // websocket服务器处理的协议  并且用于指定给客户端连接访问的路由：/ws
                 .addLast("protocolHandler",new WebSocketServerProtocolHandler("/ws"))
                 // 自己定义的消息处理器
-                .addLast("chatHandler",chatHandler);
+                .addLast("chatHandler", new ChatHandler());
     }
 }

@@ -18,8 +18,7 @@ import javax.annotation.Resource;
 @Component
 public class ChatWebSocketServer {
 
-    @Resource
-    WebSocketServerInitializer webSocketServerInitializer;
+
     public void run() {
         EventLoopGroup boss = new NioEventLoopGroup();
         EventLoopGroup work = new NioEventLoopGroup();
@@ -33,8 +32,33 @@ public class ChatWebSocketServer {
                     // 设置NIO双向通道类型
                     .channel(NioServerSocketChannel.class)
                     //设置子路由器
-                    .childHandler(webSocketServerInitializer);
-            Channel channel = serverBootstrap.bind(8088).sync().channel();
+                    .childHandler(new WebSocketServerInitializer());
+            Channel channel = serverBootstrap.bind(8089).sync().channel();
+            channel.closeFuture().addListener(future -> {
+                boss.shutdownGracefully();
+                work.shutdownGracefully();
+            });
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static void main(String[] args) {
+        EventLoopGroup boss = new NioEventLoopGroup();
+        EventLoopGroup work = new NioEventLoopGroup();
+
+        try {
+            ServerBootstrap serverBootstrap = new ServerBootstrap();
+
+            serverBootstrap
+                    // 设置主从线程组
+                    .group(boss, work)
+                    // 设置NIO双向通道类型
+                    .channel(NioServerSocketChannel.class)
+                    //设置子路由器
+                    .childHandler(new WebSocketServerInitializer());
+            Channel channel = serverBootstrap.bind(8089).sync().channel();
             channel.closeFuture().addListener(future -> {
                 boss.shutdownGracefully();
                 work.shutdownGracefully();
